@@ -361,7 +361,7 @@ terraform plan
 terraform apply
 ```
 
-## 🔐 Security
+Security
 
 ### Security Best Practices
 
@@ -372,15 +372,7 @@ terraform apply
 - ✅ Network policies
 - ✅ Resource limits di Kubernetes
 
-### Secrets Management
-
-**PENTING**: Jangan commit secrets ke repository!
-
-- Gunakan Kubernetes Secrets untuk production
-- Gunakan environment variables untuk development
-- Gunakan secret management tools (AWS Secrets Manager, HashiCorp Vault)
-
-## 📝 Environment Variables
+Environment Variables
 
 ```bash
 ENVIRONMENT=production
@@ -391,46 +383,3 @@ SECRET_KEY=your-secret-key-here
 DATABASE_URL=postgresql://user:pass@host:5432/db
 REDIS_URL=redis://host:6379/0
 ```
-
-## 🤝 Contributing
-
-1. Fork repository
-2. Create feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to branch (`git push origin feature/AmazingFeature`)
-5. Open Pull Request
-
-### Development Workflow
-
-1. Install pre-commit hooks: `pre-commit install`
-2. Create feature branch
-3. Make changes
-4. Run tests: `make test`
-5. Format code: `make format`
-6. Commit (pre-commit hooks will run automatically)
-7. Push and create PR
-
-## 📄 License
-
-This project is licensed under the MIT License.
-
-## 👥 Authors
-
-- DevOps Team
-
-## 🙏 Acknowledgments
-
-- All open-source tools and libraries used in this project
-- DevOps community for best practices and guidelines
-
-## 📞 Support
-
-Untuk pertanyaan atau bantuan:
-- Create an issue di GitHub
-- Check documentation
-- Contact DevOps team
-
----
-
-**Happy DevOps! 🚀**
-
