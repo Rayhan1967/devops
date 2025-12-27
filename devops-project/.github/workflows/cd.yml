@@ -1,0 +1,70 @@
+name: CD Pipeline
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy'
+        required: true
+        default: 'production'
+        type: choice
+        options:
+          - production
+          - staging
+
+env:
+  DOCKER_REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  deploy:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.environment || 'production' }}
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v3
+      
+      - name: Configure kubectl
+        run: |
+          echo "${{ secrets.KUBECONFIG }}" | base64 -d > kubeconfig
+          export KUBECONFIG=./kubeconfig
+      
+      - name: Deploy to Kubernetes
+        run: |
+          export KUBECONFIG=./kubeconfig
+          
+          # Update image in deployment
+          kubectl set image deployment/devops-app app=${{ env.DOCKER_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.ref_name }} -n devops-app
+          
+          # Wait for rollout
+          kubectl rollout status deployment/devops-app -n devops-app
+          
+          # Verify deployment
+          kubectl get pods -n devops-app
+      
+      - name: Run smoke tests
+        run: |
+          export KUBECONFIG=./kubeconfig
+          SERVICE_URL=$(kubectl get service devops-app-service -n devops-app -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
+          
+          # Wait for service to be ready
+          sleep 30
+          
+          # Run health check
+          curl -f http://$SERVICE_URL/ || exit 1
+      
+      - name: Notify deployment
+        if: always()
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          text: 'Deployment to ${{ github.event.inputs.environment || "production" }} completed'
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
